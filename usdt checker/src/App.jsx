@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ethers } from "ethers";
-import binanceLogo from "./binance-yellow-rhombus-lawc3crgelc4t98h.jpg";
+import "./App.css";
 
 export default function App() {
   const [walletAddress, setWalletAddress] = useState("");
