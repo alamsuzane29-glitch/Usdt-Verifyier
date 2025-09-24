@@ -1,52 +1,72 @@
-/* App.css */
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #121212;
-  color: #E0E0E0;
-  margin: 0;
-  padding: 0;
+/* Main container */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #0f0f0f;
+  color: white;
+  text-align: center;
+  font-family: sans-serif;
 }
 
-/* Button */
+/* Title */
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  background: linear-gradient(90deg, #facc15, #fbbf24, #facc15);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow-move 3s infinite linear;
+}
+
+/* Verify button */
 .button-primary {
-  background-color: #FACC15;
+  background: linear-gradient(90deg, #facc15, #fbbf24, #facc15);
+  background-size: 200% 200%;
   color: #121212;
   padding: 1rem 2rem;
   border-radius: 9999px;
   font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
   z-index: 10;
-  cursor: pointer;
-  border: none;
+  box-shadow: 0 0 15px rgba(250, 204, 21, 0.6);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  animation: glow-move 3s infinite linear, pulse-brightness 3s infinite ease-in-out;
 }
 
 .button-primary:hover {
-  background-color: #fbbf24;
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.9);
 }
 
-/* Pulse Ring */
+/* Pulse rings */
 .pulse-ring {
   position: absolute;
-  border: 2px solid #FACC15;
+  border: 3px solid rgba(250, 204, 21, 0.7);
   border-radius: 50%;
   width: 160px;
   height: 160px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: pulse-ring 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  z-index: 1;
+  animation: pulse-ring 3s infinite ease-out, pulse-brightness 3s infinite ease-in-out;
+  opacity: 0;
 }
 
-.pulse-ring:nth-child(1) { animation-delay: 0s; }
-.pulse-ring:nth-child(2) { animation-delay: 1s; }
-.pulse-ring:nth-child(3) { animation-delay: 2s; }
+.pulse-ring:nth-child(1) {
+  animation-delay: 0s;
+}
+.pulse-ring:nth-child(2) {
+  animation-delay: 1s;
+}
+.pulse-ring:nth-child(3) {
+  animation-delay: 2s;
+}
 
+/* Keyframes */
 @keyframes pulse-ring {
   0% {
-    transform: scale(0.8);
-    opacity: 0.7;
+    transform: scale(0.6);
+    opacity: 0.8;
   }
   70% {
     transform: scale(1.3);
@@ -57,8 +77,20 @@ body {
   }
 }
 
-/* Card hover effect */
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(250, 204, 21, 0.3);
+@keyframes glow-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes pulse-brightness {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
 }
