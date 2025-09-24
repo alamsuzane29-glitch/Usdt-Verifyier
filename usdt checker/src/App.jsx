@@ -125,7 +125,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer>&copy; 2025 BNB Verify. Powered by BNB Chain.</footer>
+      <footer>&copy; 2025 BNB Verify. Powered by Binance.</footer>
     </div>
   );
 }
