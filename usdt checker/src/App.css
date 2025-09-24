@@ -1,39 +1,48 @@
-/* Pulse Rings & Button */
-.pulse-ring {
-  border: 2px solid #FACC15;
-  border-radius: 50%;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  transform: translate(0,0);
-  animation: pulse 2.5s cubic-bezier(0.4,0,0.6,1) infinite;
-  filter: blur(4px);
-}
-@keyframes pulse {
-  0% { transform: scale(0.8); opacity: 0.6; }
-  70% { transform: scale(1.3); opacity: 0; }
-  100% { opacity: 0; }
-}
+body, html, #root, .App { margin:0; padding:0; font-family:'Inter',sans-serif; background:#121212; color:#E0E0E0; }
 
-.center-button {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #121212;
-  color: #FACC15;
-  font-weight: 600;
-  padding: 1rem 2rem;
-  border-radius: 9999px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  z-index: 10;
-  box-shadow: 0 0 20px #FACC15;
-  transition: all 0.3s ease;
-}
-.center-button:hover {
-  box-shadow: 0 0 40px #FACC15;
-  transform: translate(-50%, -50%) scale(1.05);
+/* Navbar */
+.navbar { background:#171717; backdrop-filter:blur(6px); position:sticky; top:0; z-index:50; padding:1rem 1.5rem; }
+.nav-logo { display:flex; align-items:center; gap:0.5rem; color:#FACC15; font-weight:bold; text-decoration:none; }
+.nav-logo-icon { width:32px; height:32px; background:#FACC15; border-radius:50%; }
+
+/* Hero */
+.hero { display:flex; justify-content:space-between; align-items:center; padding:4rem 2rem; gap:2rem; flex-wrap:wrap; }
+.hero-left { max-width:500px; text-align:left; }
+.hero-left h1 { font-size:2.5rem; font-weight:bold; color:#FACC15; margin:1rem 0; }
+.hero-left p { font-size:1rem; color:#AAA; margin-bottom:1.5rem; }
+.hero-left .badge { background:#1E1E1E; color:#FACC15; font-size:0.75rem; font-weight:600; padding:0.25rem 0.75rem; border-radius:9999px; display:inline-block; }
+.hero-buttons button { background:#FACC15; color:#121212; font-weight:600; padding:1rem 2rem; border-radius:9999px; border:none; cursor:pointer; transition:0.3s; position:relative; z-index:10; }
+.hero-buttons button:hover { transform:translateY(-2px); }
+
+.hero-right { position:relative; width:250px; height:250px; display:flex; justify-content:center; align-items:center; margin:auto; }
+.pulse-ring { position:absolute; border:2px solid #FACC15; border-radius:50%; animation:pulse 2.5s infinite; }
+.pulse-ring.outer { width:100%; height:100%; animation-delay:0s; }
+.pulse-ring.middle { width:70%; height:70%; animation-delay:0.8s; }
+.pulse-ring.inner { width:45%; height:45%; animation-delay:1.6s; }
+.center-logo { width:60px; height:60px; background:#FACC15; border-radius:50%; z-index:10; }
+@keyframes pulse { 0%{ transform:scale(0.8); opacity:0.7; } 70%{ transform:scale(1.3); opacity:0; } 100%{ opacity:0; } }
+
+/* Cards */
+.cards-section { display:flex; flex-wrap:wrap; gap:1rem; padding:3rem 1rem; justify-content:center; overflow-x:auto; }
+.card { background:#1E1E1E; border-radius:1rem; padding:1.5rem; text-align:center; transition:all 0.3s; cursor:pointer; min-width:200px; flex:0 0 auto; }
+.card:hover { transform:translateY(-5px); box-shadow:0 10px 20px rgba(250,204,21,0.3); }
+.card h2 { color:#FACC15; margin-bottom:0.5rem; font-size:1.1rem; font-weight:600; }
+.card p { color:#AAA; font-size:0.85rem; }
+
+/* Footer */
+footer { text-align:center; padding:2rem 1rem; color:#888; font-size:0.8rem; }
+
+/* Mobile adjustments */
+@media(max-width:768px){
+  .hero { flex-direction:column; text-align:center; padding:2rem 1rem; }
+  .hero-left h1 { font-size:1.8rem; line-height:2.2rem; }
+  .hero-left p { font-size:0.9rem; margin-bottom:1rem; }
+  .hero-buttons { flex-direction:column; gap:0.75rem; }
+  .hero-right { width:200px; height:200px; }
+  .pulse-ring.outer { width:100%; height:100%; }
+  .pulse-ring.middle { width:70%; height:70%; }
+  .pulse-ring.inner { width:45%; height:45%; }
+  .center-logo { width:50px; height:50px; }
+  .cards-section { flex-wrap:nowrap; overflow-x:auto; padding:2rem 1rem; }
+  .card { min-width:180px; }
 }
