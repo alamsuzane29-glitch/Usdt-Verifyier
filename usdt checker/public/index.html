@@ -8,9 +8,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.0/ethers.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://www.google.com/url?sa=i&url=https%3A%2F%2Fseeklogo.com%2Fvector-logo%2F598330%2Fbinance-icon&psig=AOvVaw1iAapid6taPz95Y7dxPM45&ust=1758816552545000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNjysLbk8Y8DFQAAAAAdAAAAABAE" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #121212; color: #E0E0E0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: #E0E0E0;
+    }
     .button-primary {
       background-color: #FACC15;
       color: #121212;
@@ -49,8 +53,7 @@
   <header class="bg-[#171717] bg-opacity-90 backdrop-blur-md sticky top-0 z-50 shadow-md">
     <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
       <a href="#" class="flex items-center space-x-2">
-        <!-- Binance Logo -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Binance_Logo.png" alt="Binance Logo" class="h-8 w-8">
+        <img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=024" alt="Binance Logo" class="h-8 w-8"/>
         <span class="text-xl font-bold text-yellow-400">Binance Verify</span>
       </a>
       <div class="hidden md:flex space-x-8 text-sm font-medium">
@@ -77,7 +80,7 @@
       <div class="pulse-ring"></div>
       <div class="pulse-ring"></div>
       <div class="pulse-ring"></div>
-      <button onclick="handleVerify()" class="button-primary">Verify</button>
+      <button onclick="handleVerify()" class="button-primary z-10">Verify</button>
     </div>
     <p id="status" class="text-gray-300 text-lg">Click Verify to start...</p>
   </main>
